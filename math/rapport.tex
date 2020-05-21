@@ -1,0 +1,157 @@
+\documentclass{article}
+
+\usepackage{amsmath, amssymb, cancel}
+\usepackage{verbatim}
+\usepackage[utf8]{inputenc}
+
+\title{Dice trading}
+\author{François Medina}
+
+\newcommand{\dice}{\{1,\dots,6\}}
+\renewcommand{\P}{\mathbb P}
+\newcommand{\getoutput}[1]{\verbatiminput{data/output-#1.txt}}
+
+\begin{document}
+    \maketitle
+    \section*{Question 1}
+    \paragraph{(a)}
+    This dynamical system is defined by the following elements :
+    \begin{itemize}
+        \item For each time step $t$,
+            a dice count $d_t$ and accumulated score $s_t$
+        \item At each step, the possibility (boolean $b_t$)
+            to trade off five points for a die
+        \item The system follows the following dynamic :
+            \begin{align}
+                s_0 &= 0,\quad d_0 = 1\\
+                b_t &\leq s_t - 5\\
+                d_{t+1} &= d_t + b_t\\
+                s_{t+1} &= s_t + \max_{1\leq i\leq d_t}X_i - 5b_t
+            \end{align}
+            Where $X_i$ are iid of uniform law on $\dice$.
+    \end{itemize}
+    As defined in \texttt{model.py} we hold game rules
+    (price of a new dice, number of turns, and upcoming extensions)
+    in the structure \texttt{Game}, and the game state in \texttt{State}.
+    This allows us to encode each rule set in a simple \texttt{yaml} file.
+
+    \paragraph{(b)}
+    In order to easily choose which strategies to use on a given run,
+    we use a registration system through the \texttt{Strategy} class.
+    We can define a strategy as a standalone function taking the game,
+    step and state to return a boolean decision, with a \texttt{@buy}
+    (or later \texttt{@sell}) decorator for registration.
+    We can also directly use a class inheriting from \texttt{Strategy},
+    which will hold game rules as an instance attribute and provide a
+    \texttt{buy} method taking just the step and state as arguments.
+
+    In practice the standalone function will be turned into a
+    \texttt{Strategy} subclass, and these will be instantiated with
+    game rules by the simulator.
+
+    The default behavior for the player is to not do anything.
+    We call this \texttt{passive} for future reference.
+    A simple heuristic would be to value a new dice by
+    the difference in maximum roll expectancy multiplied by the remaining
+    playing time, to which we subtract its price.
+    We call this the \texttt{basic} strategy.
+
+    Any decision that does not respect game rules will be ignored by the simulator anyways.
+
+
+    \paragraph{(c)}
+    A \texttt{Simulator} instance takes the game rules as its sole
+    attribute, and provides a \texttt{run} method that takes a
+    sample size and \texttt{Strategy} instance.
+    It then plays the game the required number of times with the given strategy.
+    This is sped up by multiprocessing, through the constant \texttt{CORES},
+    to be adjusted to the hardware the script runs on.
+    Finally, the method returns a 95\% confidence interval for the average
+    score obtained with the strategy.
+
+    We get the following results with the aforementioned strategies :
+    \getoutput{1c}
+
+
+    \paragraph{(d)}
+    Let $X_1\dots X_N$ with $N\in\mathbb N$ be iid of uniform law on $\dice$.\\
+    Let $M_N=\max_{i=1}^NX_i$ , we have :
+    \begin{equation}
+        \forall k\in\dice,\quad
+        \mathbb{P}(M_N\leq k)=\P\left(\cup_{i=1}^NX_i\leq k\right)
+        =\left(\frac{k}{6}\right)^N
+    \end{equation}
+    Hence the following distribution for $M_N$ :
+    \begin{equation}
+        \forall k\in\dice,\quad
+        \mathbb{P}(M_N=k)=p^N_k:=\frac{1}{6^N}\left(k^N-(k-1)^N\right)
+    \end{equation}
+    We can therefore simulate $\max_{i=1}^NX_i$ with :
+    \begin{equation}
+        M_N'=\min\left\{
+            k\in\dice,\quad6^M\sum_{i=1}^kp^N_i>\xi
+        \right\}
+    \end{equation}
+    Where we now have exogenous noise $\xi$ following a uniform distribution on
+    $\{1,\dots,6^M\}$ with $M$ greater than any possible $N$
+    ($M=10\times6/5=12$ would work here).
+
+    Indeed we have :
+    \begin{align}
+        \mathbb P(M_N'=k)&=
+        \mathbb P\left(6^M\sum_{i=1}^{k-1}p^N_i\leq\xi<6^M\sum_{i=1}^kp^N_i\right)\\
+                         &=\frac{\cancel{6^M}p^N_k}{\cancel{6^M}}\\
+                         &=\mathbb P(M_N=k)
+    \end{align}
+
+    \paragraph{(e-f)}
+    With dynamic programming we find the optimal value $V_0=37.62$.
+    The associated strategy is : "buy a second dice within the first 5 turns".
+    We get the following results from the simulator, with 95\% confidence intervals
+    (where \texttt{dynamic} is the solver's solution while \texttt{optimal\_1e}
+    is the interpretation described above):
+    \getoutput{1e}
+
+    \paragraph{(h)}
+    With no dice limit we get the following results :
+    \getoutput{1h}
+    This means the limit of three dice is ineffective with this set of rules.
+
+    \section*{Question 2}
+    \paragraph{(a)}
+    The player now has the ability to sell a dice to double the score from a roll,
+    if he has at least two dice. This decision now also depends on the dice roll.
+    It is implemented like the buying decision with this extra argument,
+    through the \texttt{sell} decorator or a \texttt{Strategy} method of the same name.\\
+    We consider the following algorithm, defining for each step $t$, score $s$, dice count $d$
+    and dice roll $r\in\dice$ :
+    \begin{itemize}
+        \item $V_{t,s,d}$ and $V'_{t,s,d,r}$ the expected score before and after the roll
+        \item $B_{t,s,d}$ and $S_{t,s,d,r}$ the decisions whether to buy and sell a dice
+    \end{itemize}
+    The algorithm follows the following dynamic :
+    \begin{align}
+        V_{T,s,\cdot} &= s\\
+        V'_{t,s,d,r} &= \max
+        \begin{cases}
+            V_{t+1,s+r,d}\\
+            V_{t+1,s+2r,d-1}\quad\text{if }d\geq2
+        \end{cases}\\
+        V_{t,s,d} &= \max
+        \begin{cases}
+            \sum_{r=1}^6p^d_rV'_{t,s,d,r}\\
+            \sum_{r=1}^6p^d_rV'_{t,s-5,d+1,r}\quad\text{if }d<5,s > 6
+        \end{cases}
+    \end{align}
+    With $B$ and $S$ being the argmax for each decision.\\
+    This gives us the following results :
+    \getoutput{2a}
+
+    \paragraph{(b)}
+    With no limit we have :
+    \getoutput{2b}
+
+    \paragraph{(c)}
+    With dice liquidation at the end we get :
+    \getoutput{2c}
+\end{document}

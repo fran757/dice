@@ -1,0 +1,5 @@
+game:
+  price: 5
+  time: 80
+  rule: 1
+  limit: 5

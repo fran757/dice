@@ -1,0 +1,6 @@
+game:
+  price: 5
+  time: 10
+  rule: 1
+  limit: 5
+  liquid: [0, 2, 4, 5, 8]
