@@ -1,6 +1,7 @@
 """Dice game optimization."""
 
 from .dynamic import Solver
+from .model import Game, State
 from .simulate import Simulator
 from .strategy import Strategy, buy, sell
 from .tools import Bar, report
@@ -12,7 +13,7 @@ class Passive(Strategy):
 
 class Basic(Strategy):
     """Basic strategy as control subject."""
-    expected = {}
+    expected = {}  # todo: handle parallel access
 
     def expect(self, dice):
         """Roll expectation for given number of dice.

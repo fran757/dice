@@ -11,7 +11,7 @@ import yaml
 from . import Game, dynamic, simulate
 
 
-def parse(*args):
+def parse():
     """Parse system arguments."""
     parser = argparse.ArgumentParser(description="dice game simulation")
     parser.add_argument(
@@ -34,19 +34,19 @@ def parse(*args):
         help="don't simulate the game"
     )
     parser.add_argument(
-        'size',
-        type=int, default=10000, nargs='?',
+        '-n', '--size',
+        type=int, default=10000,
         help='sample size per strategy')
     parser.add_argument(
         'names',
         nargs='*', default=[],
         help='strategies to compare')
-    return parser.parse_args(map(str, args) if args else None)
+    return parser.parse_args()
 
 
-def main(*args):
+def main(**kwargs):
     """Get sample size, report expected score and execution time."""
-    args = parse(*args)
+    args = argparse.Namespace(**kwargs) if kwargs else parse()
     game = Game(**yaml.safe_load(args.game))
     if args.dynamic:
         dynamic(game, args.output)
