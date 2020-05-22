@@ -1,5 +1,4 @@
-game:
-  price: 5
-  time: 10
-  limit: 5
-  rule: 1
+price: 5
+time: 10
+limit: 5
+rule: 1

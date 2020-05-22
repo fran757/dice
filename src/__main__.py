@@ -8,8 +8,7 @@ import argparse
 from os.path import join, dirname
 import yaml
 
-from .model import Game
-from . import dynamic, simulate
+from . import Game, dynamic, simulate
 
 
 def parse(*args):
@@ -48,7 +47,7 @@ def parse(*args):
 def main(*args):
     """Get sample size, report expected score and execution time."""
     args = parse(*args)
-    game = Game(**yaml.safe_load(args.game)["game"])
+    game = Game(**yaml.safe_load(args.game))
     if args.dynamic:
         dynamic(game, args.output)
     if args.simulate:
