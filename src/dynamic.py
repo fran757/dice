@@ -107,18 +107,18 @@ class Solver:
         (represented by the iterable `states`).
         """
         # print([x1-x0 for x1, x0 in zip(self.game.liquid[1:], self.game.liquid[:-1])])
-        if self.game.time > 10 and self.game.limit:
-            midpoint = int(self.game.time / 2)
-            endgame = Solver(replace(self.game, time=midpoint))
-            endgame.run()
-            opening = Solver(replace(self.game, time=midpoint, liquid=endgame.scores[0, 0, 1:]))
-            opening.run()
-            self.scores = np.concatenate((opening.scores, endgame.scores))
-            # self.buying = np.concatenate((opening.buying, endgame.buying))
-            # if self.game.rule:
-            #     self.selling = np.concatenate((opening.selling, endgame.selling))
-            self.solved = True
-            return
+        # if self.game.time > 10 and self.game.limit:
+        #     midpoint = int(self.game.time / 2)
+        #     endgame = Solver(replace(self.game, time=midpoint))
+        #     endgame.run()
+        #     opening = Solver(replace(self.game, time=midpoint, liquid=endgame.scores[0, 0, 1:]))
+        #     opening.run()
+        #     self.scores = np.concatenate((opening.scores, endgame.scores))
+        #     # self.buying = np.concatenate((opening.buying, endgame.buying))
+        #     # if self.game.rule:
+        #     #     self.selling = np.concatenate((opening.selling, endgame.selling))
+        #     self.solved = True
+        #     return
 
         for step in range(self.game.time)[::-1]:
             score = self.lucky(step, self.game.rule)
@@ -136,11 +136,12 @@ class Solver:
             #     print([v-u for u,v in zip(scores[:-1], scores[1:])])
         self.solved = True
 
-    @property
-    def value(self):
-        """Get optimal value (compute it if needed)."""
+    def value(self, *, bonus=False):
+        """Get expected value with optimal strategy (compute it if needed)."""
         if not self.solved:
             self.run()
+        if bonus:
+            return self.scores[0, 0, 1:]
         return self.scores[0, 0, 1]
 
 

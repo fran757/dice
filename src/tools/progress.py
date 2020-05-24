@@ -7,8 +7,8 @@ from multiprocessing import Value
 
 def track(fun):
     """Enable tracking by a progress bar.
-    This needs to be done before runtime
-    to allow pickling in multiprocessing.
+    This needs to be done before 'runtime'
+    to allow pickling for multiprocessing.
     """
     @wraps(fun)
     def tracked(*args, **kwargs):
@@ -19,10 +19,10 @@ def track(fun):
 
 @dataclass
 class Bar:
-    """Knowing estimated computation time (can be any unitless arbitrary value),
-    update a loading bar on each call given current remaining time.
+    """Knowing number of iterations, track progress with a loading bar.
+    Tracking is enabled before instanciation, hence the singleton pattern.
     """
-    width = 50
+    width = 30
     _instance = None
 
     def __new__(cls, *args):
@@ -41,7 +41,7 @@ class Bar:
 
     @classmethod
     def advance(cls):
-        """Advance loading bar, draw if buffer reaches 1% of total."""
+        """Advance loading bar, draw on every 1% step (with buffering for speed)."""
         self = cls._instance
         if self is None:
             return
@@ -57,4 +57,5 @@ class Bar:
         print(f"{self.message:<10}: |{display}| {100 * ratio:.0f}% Complete", end="\r")
 
     def __exit__(self, exception, value, traceback):
-        print(" " * (self.width + 30), end='\r')
+        """Hide the bar when progress is over."""
+        print(" " * (self.width + 28), end="\r")

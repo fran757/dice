@@ -12,12 +12,12 @@ from .model import Game, State
 from .tools import track, chrono
 
 
-CORES = 5
+CORES = 3
 
 
 @dataclass
 class Simulator:
-    """Simulates game."""
+    """Simulate game."""
     game: Game
 
     @track
@@ -45,8 +45,8 @@ class Simulator:
 
     @chrono
     def run(self, size, strategy):
-        """Compute scores from n games with strategy,
-        with 95% confidence interval.
+        """Compute 95% confidence interval on strategy score expectation,
+        with given sample size.
         """
         with Pool(CORES) as pool:
             scores = pool.map(self.play, repeat(strategy(self.game), size))

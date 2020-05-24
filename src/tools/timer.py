@@ -1,4 +1,4 @@
-"""Simple module to record execution times."""
+"""Record execution times of functions."""
 
 import atexit
 from functools import wraps
@@ -9,8 +9,9 @@ from .report import report
 
 
 class Clock:
-    """Record and report average execution time of function.
-    Instance registration by function name.
+    """Record and report total execution time of function.
+    Instance registration by function qualname.
+    If no report is called, times will be reported upon kernel exit.
     """
     _known = {}
 
@@ -54,7 +55,7 @@ class Clock:
 
     @classmethod
     def retrieve(cls):
-        """Retrieve clock records into single dictionary."""
+        """Retrieve clock records into single dictionary and reset them."""
         records = {}
         for name, instance in cls._known.items():
             if instance.calls.value:
@@ -73,7 +74,7 @@ class Clock:
 
 
 def chrono(fun):
-    """Clock decorator : register 'fun' execution times.
+    """Clock decorator : register `fun` execution time.
     Closure preserves method identity.
     """
     clock = Clock.provide(fun.__qualname__)

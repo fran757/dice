@@ -1,4 +1,8 @@
-"""Game strategies."""
+"""Game strategy base.
+A strategy can either inherit from `Strategy` and implement buy/sell methods,
+or be a standalone function with a buy/sell decorator.
+The strategy's name is changed to lower case in the registry.
+"""
 
 
 class Strategy:
@@ -28,8 +32,6 @@ class Strategy:
         for name in names:
             if name not in cls._registry:
                 continue
-                # name = f"{name} (?)"
-                # globals()[name] = type(name, (cls,), {})
             selected.update({name: cls._registry[name]})
         return selected
 

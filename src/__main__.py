@@ -1,14 +1,18 @@
-#!/usr/bin/env python
-
 """Run package with `python -m $pkg_name`.
 Help on system arguments with the `-h` or `--help` flag.
 """
-
 import argparse
 from os.path import join, dirname
 import yaml
 
-from . import Game, dynamic, simulate
+from . import Game, dynamic, liquidate, simulate
+
+
+def load(data):
+    """Extract data from file descriptor if needed."""
+    if isinstance(data, dict):
+        return data
+    return yaml.safe_load(data)
 
 
 def parse():
@@ -26,13 +30,15 @@ def parse():
     parser.add_argument(
         '-d', '--dynamic',
         action='store_true',
-        help="show dynamic programming result"
-    )
+        help="show dynamic programming value")
+    parser.add_argument(
+        '-k', '--liquidate',
+        action='store_true',
+        help="show equivalent liquidation values")
     parser.add_argument(
         '-s', '--simulate',
-        action='store_false',
-        help="don't simulate the game"
-    )
+        action='store_true',
+        help="run game simulations")
     parser.add_argument(
         '-n', '--size',
         type=int, default=10000,
@@ -47,12 +53,12 @@ def parse():
 def main(**kwargs):
     """Get sample size, report expected score and execution time."""
     args = argparse.Namespace(**kwargs) if kwargs else parse()
-    game = Game(**yaml.safe_load(args.game))
+    game = Game(**load(args.game))
     if args.dynamic:
         dynamic(game, args.output)
+    if args.liquidate:
+        liquidate(game, args.output)
     if args.simulate:
         simulate(game, args.size, args.names, args.output)
 
-
-if __name__ == "__main__":
-    main()
+main()

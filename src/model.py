@@ -1,4 +1,4 @@
-"""Simple representations of game rules and state."""
+"""Simple representation of game rules and state."""
 
 from dataclasses import dataclass
 from typing import Tuple
@@ -6,7 +6,9 @@ from typing import Tuple
 
 @dataclass(frozen=True)
 class Game:
-    """Game rules are defined by dice price and total time."""
+    """Represent game rules: dice price, total time,
+    whether dice selling is allowed, dice limit and dice liquidation bonus.
+    """
     price: int
     time: int
     rule: bool = False

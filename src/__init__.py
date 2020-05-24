@@ -4,7 +4,7 @@ from .dynamic import Solver
 from .model import Game, State
 from .simulate import Simulator
 from .strategy import Strategy, buy, sell
-from .tools import Bar, report
+from .tools import Bar, report, table
 
 
 class Passive(Strategy):
@@ -52,14 +52,19 @@ class Dynamic(Solver, Strategy):
             self.run()
 
 
-def dynamic(game, output):
-    """Run game solver."""
-    solver = Solver(game)
-    solver.run()
-    print("optimal value: ", round(solver.scores[0, 0, 1], 4), file=output)
+def dynamic(game, output=None):
+    """Show expected value with dynamic programming."""
+    print("optimal value: ", round(Solver(game).value(), 4), file=output)
 
+def liquidate(game, output=None):
+    """Show liquidation values equivalent to game."""
+    prices = map(str, (round(s, 1) for s in Solver(game).value(bonus=True)))
+    data = {
+        "dice": [d + 1 for d in range(game.limit)],
+        "bonus": list(prices)}
+    table("Liquidation", data, output)
 
-def simulate(game, size, names, output):
+def simulate(game, size, names, output=None):
     """Run game simulation with given sample size and strategy names."""
     simulator = Simulator(game)
     strategies = Strategy.retrieve(*names)
