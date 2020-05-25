@@ -157,6 +157,16 @@
 
     \paragraph{(d)}
     We compute the expected scores when starting a 10-turn game with several dice,
-    which gives us liquidation bonuses to simulate 10 more turns at the end of a game :
+    which gives us liquidation bonuses to simulate 10 more turns at the end of a game.
+    \getoutput{2d1}
+    Comparing that to an actual 20-turn game :
     \getoutput{2d}
+    We note that the solver runs twice faster with this shortcut.
+    See clock reports by running \texttt{make} after deleting this question's outputs in
+    \texttt{data} or with \texttt{make clean},
+    or running the corresponding commands manually :\\
+    \texttt{\$ python -m src -g data/game-2a.yaml -kd}\\
+    \texttt{\$ python -m src -g data/game-2d.yaml -d}\\
+    One should however also update the strategic tables, or use a 10-turn strategy on the
+    endgame, substracting the score at the end of the 10th turn for each access.
 \end{document}

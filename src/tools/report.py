@@ -20,5 +20,4 @@ def table(title, data, output=None):
     label_width = max([len(key) for key in data.keys()])
     label       = f"{{key:<{label_width}}} |"
     cells       = " ".join([f"{{value[{i}]:<{width}}}" for i in range(columns)])
-    message = "{{l}} {{c}}".format(l=label, c=cells)
     report(title, data, f"{label} {cells}", output)

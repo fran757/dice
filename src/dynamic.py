@@ -143,35 +143,3 @@ class Solver:
         if bonus:
             return self.scores[0, 0, 1:]
         return self.scores[0, 0, 1]
-
-
-# def main():
-#     """Solve sample game, report buying conditions and expected score."""
-#     from functools import partial
-#     import yaml
-#     with open("game.yaml") as file:
-#         game = Game(**yaml.safe_load(file)["game"])
-#     solver = Solver(game)
-#     solver.run()
-#     if game.rule:
-#         print(np.where(solver.selling == 1))
-#     else:
-#         buying = np.where(solver.buying[:, :, 1:] == 1)
-#         for step in set(buying[0]):
-#             print(step, [state[1:] for state in zip(*buying) if state[0] == step])
-#     # print(np.round(solver.scores[0, 0, 1], 2))
-#     print(*map(partial(round, ndigits=4), solver.scores[0, 0, :]))
-
-
-# def horizons():
-#     """For which horizon is it never interesting to buy in a (5, 10) game ?"""
-#     for horizon in range(1, 6):
-#         game = Game(5, horizon)
-#         solver = Solver(game)
-#         solver.run()
-#         print(horizon, np.where(solver.buying > 0))
-
-
-# if __name__ == "__main__":
-#     from .model import Game
-#     main()

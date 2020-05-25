@@ -1,11 +1,11 @@
-"""Run package with `python -m $pkg_name`.
-Help on system arguments with the `-h` or `--help` flag.
+"""Run package with `python -m $pkg_name` (default is `src`).
+Help on system arguments with the additional `-h` or `--help` flag.
 """
 import argparse
 from os.path import join, dirname
 import yaml
 
-from . import Game, dynamic, liquidate, simulate
+from . import Game, dynamic, liquidate, simulation
 
 
 def load(data):
@@ -54,11 +54,11 @@ def main(**kwargs):
     """Get sample size, report expected score and execution time."""
     args = argparse.Namespace(**kwargs) if kwargs else parse()
     game = Game(**load(args.game))
+    if args.liquidate:
+        game = liquidate(game, args.output)
     if args.dynamic:
         dynamic(game, args.output)
-    if args.liquidate:
-        liquidate(game, args.output)
     if args.simulate:
-        simulate(game, args.size, args.names, args.output)
+        simulation(game, args.size, args.names, args.output)
 
 main()
