@@ -6,6 +6,7 @@ from os.path import join, dirname
 import yaml
 
 from . import Game, dynamic, liquidate, simulation
+from .tools import Clock
 
 
 def load(data):
@@ -40,6 +41,10 @@ def parse():
         action='store_true',
         help="run game simulations")
     parser.add_argument(
+        '-c', '--clock',
+        action='store_true',
+        help="include clock report in output")
+    parser.add_argument(
         '-n', '--size',
         type=int, default=10000,
         help='sample size per strategy')
@@ -60,5 +65,7 @@ def main(**kwargs):
         dynamic(game, args.output)
     if args.simulate:
         simulation(game, args.size, args.names, args.output)
+    if args.clock:
+        Clock.report(args.output)
 
 main()

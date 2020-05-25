@@ -64,13 +64,13 @@ class Clock:
         return records
 
     @classmethod
-    def report(cls):
+    def report(cls, output=None):
         """Report clock records."""
         records = cls.retrieve()
         if not records:
             return
         message = "{key:<20} (x{value[0]:<6}): {value[1]:.3f} s"
-        report("Clock", records, message)
+        report("Clock", records, message, output)
 
 
 def chrono(fun):

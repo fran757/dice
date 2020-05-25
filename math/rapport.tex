@@ -67,7 +67,9 @@
     This is sped up by multiprocessing, through the constant \texttt{CORES},
     to be adjusted to the hardware the script runs on.
     Finally, the method returns a 95\% confidence interval for the average
-    score obtained with the strategy.
+    score obtained with the strategy.\\
+    All presented results are obtained with a sample size of 100000 games,
+    change \texttt{N} in the Makefile for better precision or faster results.
 
     We get the following results with the aforementioned strategies :
     \getoutput{1c}
@@ -158,15 +160,21 @@
     \paragraph{(d)}
     We compute the expected scores when starting a 10-turn game with several dice,
     which gives us liquidation bonuses to simulate 10 more turns at the end of a game.
+    The flat bonus is the default (expected score), to which we add the following :
     \getoutput{2d1}
     Comparing that to an actual 20-turn game :
-    \getoutput{2d}
-    We note that the solver runs twice faster with this shortcut.
-    See clock reports by running \texttt{make} after deleting this question's outputs in
-    \texttt{data} or with \texttt{make clean},
-    or running the corresponding commands manually :\\
-    \texttt{\$ python -m src -g data/game-2a.yaml -kd}\\
-    \texttt{\$ python -m src -g data/game-2d.yaml -d}\\
+    \getoutput{2d2}
+    We notice that solving the two 10-turn games is twice faster than one 20-turn game.
     One should however also update the strategic tables, or use a 10-turn strategy on the
-    endgame, substracting the score at the end of the 10th turn for each access.
+    endgame, substracting the score at the end of the 10th turn for look-ups.
+
+    \paragraph{(e)}
+    By chaining games of 10 turns in this fashion we quickly get a stable spacing between
+    bonuses.
+    Since the strategy is the same when adding a uniform bonus on all outcomes,
+    we can compute the strategy with the stable spacing and repeat it.
+    We're then better off taking directly the bonuses on a 20-turn game and chain with step
+    20. Indeed we see that the bonuses have increased but a larger step gives a lesser gain
+    in precision for a much longer computing time.
+    \getoutput{2e}
 \end{document}

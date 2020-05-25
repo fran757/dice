@@ -1,5 +1,5 @@
 """Generic tools, here adapted for multiprocessing.
-* `report` to present data
+* `report` and `table` to present data
 * `chrono` to time function execution
 * `progress` to show progress in a closed loop
 """

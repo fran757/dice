@@ -14,9 +14,12 @@ def dynamic(game, output=None):
 def liquidate(game, output=None):
     """Compute liquidation values equivalent to game and add them in."""
     prices = Solver(game).value(bonus=True)
+    value = prices[0]
+    bonus = [p - value for p in prices]
     data = {
         "dice": [d + 1 for d in range(game.limit)],
-        "bonus": [str(round(s, 2)) for s in prices]}
+        "bonus": [str(round(b, 2)) for b in bonus]}
+    print("flat bonus: ", round(value, 2), file=output)
     table("Liquidation", data, output)
     return replace(game, liquid=prices)
 
